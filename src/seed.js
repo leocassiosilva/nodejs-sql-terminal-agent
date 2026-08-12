@@ -1,9 +1,6 @@
 import {createWriteStream, statSync} from 'node:fs';
 import {faker} from '@faker-js/faker';
-
-const LOG_FILE = 'acess.log';
-
-const LOG_INTERVAL = 1 * 1000;
+import {LOG_FILE, LOG_INTERVAL} from './constants.js';
 
 const maxRecords = Number(process.argv[2] || Infinity);
 
