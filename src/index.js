@@ -1,6 +1,6 @@
 import {createInterface} from "node:readline";
 import {styleText} from "node:util";
-import {generateSqlObject} from "./ai.js";
+import {generateSqlObject, generateTextAnswer} from "./ai.js";
 import {createDb} from "./db.js";
 import {DB_FILE} from "./constants.js";
 
@@ -41,8 +41,12 @@ while (true) {
 
         const confirm = await prompt(styleText(["bold", "green"], "\nDeseja executar este SQL no banco de dados? (s/n): "));
         if (confirm.toLowerCase() === "s") {
-            const result = await db.query(sql);
-            const answer = await generateAnswer(result);
+            const result = await db.exec(sql);
+            const answer = await generateTextAnswer({
+                question,
+                sql,
+                rows: result.rows
+            });
             console.log(styleText("green", "SQL executado com sucesso!"));
         } else {
             console.log(styleText("yellow", "Execução do SQL cancelada."));
