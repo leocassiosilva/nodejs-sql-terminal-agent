@@ -5,7 +5,7 @@ import {z} from 'zod';
 
 const BLOCKED_KEYWORDS = ['INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'CREATE', 'TRUNCATE'];
 const SCHEMA_DESCRIPTION = `
-Tabela: access_logs
+Tabela: logs
 Colunas:
     - log_id INTEGER PRIMARY KEY AUTOINCREMENT,
     - ip TEXT NOT NULL,
@@ -25,7 +25,6 @@ export function validateSql(sql){
         throw new Error('Invalid SQL query');
     }
 
-    console.log('Validating SQL query:', sql);
     const safeSql = sql.trim().replace(/;\s*$/, '').trim();
 
     for (const keyword of BLOCKED_KEYWORDS) {
@@ -59,7 +58,7 @@ export async function generateSqlObject(question) {
 
       Regras obrigatórias:
       - Gere apenas SELECT.
-      - Use apenas a tabela access_logs.
+      - Use apenas a tabela logs.
       - Não use ${BLOCKED_KEYWORDS.join(', ')}.
       - Não gere múltiplas queries.
       - Não use comentários SQL.
@@ -82,15 +81,6 @@ export async function generateSqlObject(question) {
     explanation: experimental_output.explanation,
   };
 }
-
-generateSqlObject("Quaantos acessos tivemos por localização?")
-.then(({sql, explanation}) => {
-    console.log("SQL gerado:", sql);
-    console.log("Explicação:", explanation);
-})
-.catch((error) => {
-    console.error("Erro ao gerar SQL:", error.message);
-});
 
 export async function generateTextAnswer({ question, sql, rows }) {
   const { text } = await generateText({

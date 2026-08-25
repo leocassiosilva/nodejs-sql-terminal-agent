@@ -26,8 +26,12 @@ console.log("Bem-vindo ao assistente de SQL! Digite 'sair' para encerrar.");
 
 while (true) {
     const question = await prompt(styleText(["bold", "magenta"], "Pergunta: "));
-    if (question.trim()){
+    if (!question.trim()){
         continue;
+    }
+    if (question.trim().toLowerCase() === "sair"){
+        rl.close();
+        break;
     }
 
     try {
@@ -35,19 +39,16 @@ while (true) {
         const {sql, explanation} = sqlObject;
 
         console.log(styleText("cyan", "\nSQL gerado:"));
-        console.log(styleText("yellow", explanation));
-        console.log(styleText("cyan", "\nExplicação:"));
         console.log(styleText("yellow", sql));
+        console.log(styleText("cyan", "\nExplicação:"));
+        console.log(styleText("yellow", explanation));
 
         const confirm = await prompt(styleText(["bold", "green"], "\nDeseja executar este SQL no banco de dados? (s/n): "));
-        if (confirm.toLowerCase() === "s") {
-            const result = await db.exec(sql);
-            const answer = await generateTextAnswer({
-                question,
-                sql,
-                rows: result.rows
-            });
-            console.log(styleText("green", "SQL executado com sucesso!"));
+        if (confirm.trim().toLowerCase() === "s") {
+            const rows = db.prepare(sql).all();
+            const answer = await generateTextAnswer({question, sql, rows});
+            console.log(styleText("cyan", "\nResposta:"));
+            console.log(styleText("green", answer));
         } else {
             console.log(styleText("yellow", "Execução do SQL cancelada."));
         }
